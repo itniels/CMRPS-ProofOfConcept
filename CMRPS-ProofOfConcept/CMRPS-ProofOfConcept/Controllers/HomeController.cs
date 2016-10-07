@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Web;
@@ -49,18 +51,60 @@ namespace CMRPS_ProofOfConcept.Controllers
         public bool Shutdown(string name)
         {
             string cn = @"\" + name;
-            // Logic for shutdown.
+            try
+            {
+                System.Diagnostics.Process proc = new System.Diagnostics.Process();
+                System.Security.SecureString ssPwd = new System.Security.SecureString();
+                proc.StartInfo.UseShellExecute = false;
+                proc.StartInfo.FileName = "cmd.exe";
+                proc.StartInfo.Arguments = "/C ping 8.8.8.8";
+                proc.StartInfo.CreateNoWindow = true;
+                proc.StartInfo.Domain = "skole.local";
+                proc.StartInfo.UserName = "USER";
+                string password = "PASS";
+                for (int x = 0; x < password.Length; x++)
+                {
+                    ssPwd.AppendChar(password[x]);
+                }
+                proc.StartInfo.Password = ssPwd;
+                proc.Start();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
 
-            return false;
+            return true;
         }
 
         [HttpPost]
         public bool Wol(string mac)
         {
             string cleanMac = mac.Replace(":", "");
-            // Logic for wake On Lan.
+            try
+            {
+                System.Diagnostics.Process proc = new System.Diagnostics.Process();
+                System.Security.SecureString ssPwd = new System.Security.SecureString();
+                proc.StartInfo.UseShellExecute = false;
+                proc.StartInfo.FileName = @"c:\WINWAKE.exe";
+                proc.StartInfo.Arguments = "/C" + cleanMac;
+                proc.StartInfo.CreateNoWindow = true;
+                proc.StartInfo.Domain = "skole.local";
+                proc.StartInfo.UserName = "USER";
+                string password = "PASS";
+                for (int x = 0; x < password.Length; x++)
+                {
+                    ssPwd.AppendChar(password[x]);
+                }
+                proc.StartInfo.Password = ssPwd;
+                proc.Start();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
 
-            return false;
+            return true;
         }
     }
 }

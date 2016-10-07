@@ -79,7 +79,7 @@
             datatype: "text",
             type: "POST",
             success: function(data) {
-                if (data == true) {
+                if (data == "True") {
                     $('#shutdown-result').html("SENT!");
                     $("#shutdown-result").attr('class', 'ping-result-style-online');
                 } else {
@@ -103,7 +103,7 @@
             datatype: "text",
             type: "POST",
             success: function (data) {
-                if (data == true) {
+                if (data == "True") {
                     $('#wol-result').html("SENT!");
                     $("#wol-result").attr('class', 'ping-result-style-online');
                 } else {
