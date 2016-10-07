@@ -1,0 +1,120 @@
+﻿@{
+    ViewBag.Title = "Demo";
+}
+
+<div class="jumbotron">
+    <h1>CMRPS Proof Of Concept</h1>
+    <p class="lead">A demo for testing the core functionality.</p>
+</div>
+
+<div class="row">
+    <div class="col-sm-6 col-md-6 col-lg-6">
+        <p>Target machine (IP or Hostname):</p>
+        <textarea class="target-input" id="computer-name" placeholder="'lat12' OR '192.168.2.188'"></textarea>
+    </div>
+    <div class="col-sm-6 col-md-6 col-lg-6">
+        <p>Target machine (MAC):</p>
+        <textarea class="target-input" id="computer-mac" placeholder="'00:50:56:00:6D:65' OR '005056006D65'"></textarea>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Ping</h2>
+        <p>
+            Here you can ping a computer.
+        </p>
+        <p id="ping-result" class="ping-result-style-unknown">Ping: Unknown</p>
+        <p>
+            <button class="btn btn-info" onclick="DemoPing();">Ping it!</button>
+        </p>
+    </div>
+    <div class="col-md-4">
+        <h2>Shutdown</h2>
+        <p>Here you can test remote shutdown.</p>
+        <p id="shutdown-result" class="ping-result-style-unknown">Not sent yet..</p>
+        <p>
+            <button class="btn btn-danger" onclick="DemoShutdown();">Shut it down!</button>
+        </p>
+    </div>
+    <div class="col-md-4">
+        <h2>Wake On Lan</h2>
+        <p>Here you can test Wake-On-Lan</p>
+        <p id="wol-result" class="ping-result-style-unknown">Not sent yet..</p>
+        <p>
+            <button class="btn btn-success" onclick="DemoWol();">Wake it up!</button>
+        </p>
+    </div>
+</div>
+
+
+<script>
+    function DemoPing() {
+        $.ajax({
+            url: "/Home/Ping",
+            data: { 'name': $('#computer-name').val() },
+            datatype: "text",
+            type: "POST",
+            success: function(data) {
+                $('#ping-result').html("ping: " + data);
+                if (data != -1) {
+                    $("#ping-result").attr('class', 'ping-result-style-online');
+                } else {
+                    $("#ping-result").attr('class', 'ping-result-style-offline');
+                }
+            },
+            error: function() {
+                $('#ping-result').html("ERROR!");
+                $("#ping-result").attr('class', 'ping-result-style-offline');
+            }
+        });
+    };
+</script>
+
+<script>
+    function DemoShutdown() {
+        $.ajax({
+            url: "/Home/Shutdown",
+            data: { 'name': $('#computer-name').val() },
+            datatype: "text",
+            type: "POST",
+            success: function(data) {
+                if (data == true) {
+                    $('#shutdown-result').html("SENT!");
+                    $("#shutdown-result").attr('class', 'ping-result-style-online');
+                } else {
+                    $('#shutdown-result').html("NOT SENT!!");
+                    $("#shutdown-result").attr('class', 'ping-result-style-offline');
+                }
+            },
+            error: function() {
+                $('#shutdown-result').html("ERROR!");
+                $("#shutdown-result").attr('class', 'ping-result-style-offline');
+            }
+        });
+    };
+</script>
+
+<script>
+    function DemoWol() {
+        $.ajax({
+            url: "/Home/Wol",
+            data: { 'mac': $('#computer-mac').val() },
+            datatype: "text",
+            type: "POST",
+            success: function (data) {
+                if (data == true) {
+                    $('#wol-result').html("SENT!");
+                    $("#wol-result").attr('class', 'ping-result-style-online');
+                } else {
+                    $('#wol-result').html("NOT SENT!!");
+                    $("#wol-result").attr('class', 'ping-result-style-offline');
+                }
+            },
+            error: function () {
+                $('#wol-result').html("ERROR!");
+                $("#wol-result").attr('class', 'ping-result-style-offline');
+            }
+        });
+    };
+</script>
