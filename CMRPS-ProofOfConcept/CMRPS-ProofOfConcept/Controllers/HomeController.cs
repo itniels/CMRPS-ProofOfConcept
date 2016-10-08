@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -86,9 +87,9 @@ namespace CMRPS_ProofOfConcept.Controllers
                 proc.StartInfo.FileName = "cmd.exe";
                 proc.StartInfo.Arguments = "/C shutdown /s /f /m " + cn + " /c CMRPS is shutting this device down.";
                 proc.StartInfo.CreateNoWindow = true;
-                proc.StartInfo.Domain = "skole.local";
-                proc.StartInfo.UserName = "USER";
-                string password = "PASS";
+                proc.StartInfo.Domain = ConfigurationManager.AppSettings.Get("Domain");
+                proc.StartInfo.UserName = ConfigurationManager.AppSettings.Get("Username");
+                string password = ConfigurationManager.AppSettings.Get("Password");
                 foreach (char t in password)
                 {
                     ssPwd.AppendChar(t);
@@ -117,9 +118,9 @@ namespace CMRPS_ProofOfConcept.Controllers
 
                 ConnectionOptions options = new ConnectionOptions();
                 options.EnablePrivileges = true;
-                options.Username = "USERNAME";
-                options.Password = "PASSWORD";
-                options.Authority = "skole.local";
+                options.Username = ConfigurationManager.AppSettings.Get("Username");
+                options.Password = ConfigurationManager.AppSettings.Get("Password");
+                options.Authority = ConfigurationManager.AppSettings.Get("Domain");
 
                 ManagementScope scope = new ManagementScope(
                     "\\\\" + name + "\\root\\CIMV2", options);
@@ -196,9 +197,9 @@ namespace CMRPS_ProofOfConcept.Controllers
                 proc.StartInfo.FileName = @"c:\WINWAKE.exe";
                 proc.StartInfo.Arguments = "/C" + cleanMac;
                 proc.StartInfo.CreateNoWindow = true;
-                proc.StartInfo.Domain = "skole.local";
-                proc.StartInfo.UserName = "USER";
-                string password = "PASS";
+                proc.StartInfo.UserName = ConfigurationManager.AppSettings.Get("Username");
+                string password = ConfigurationManager.AppSettings.Get("Password");
+                proc.StartInfo.Domain = ConfigurationManager.AppSettings.Get("Domain");
                 foreach (char t in password)
                 {
                     ssPwd.AppendChar(t);
