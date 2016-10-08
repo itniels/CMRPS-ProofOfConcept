@@ -175,8 +175,9 @@ namespace CMRPS_ProofOfConcept.Controllers
             public void SetClientToBrodcastMode()
             {
                 if (this.Active)
-                    this.Client.SetSocketOption(SocketOptionLevel.Socket,
-                                              SocketOptionName.Broadcast, 0);
+                {
+                    this.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 0);
+                }
             }
         }
 
@@ -222,16 +223,19 @@ namespace CMRPS_ProofOfConcept.Controllers
         /// <returns></returns>
         public bool Wakeup2(string mac)
         {
+            IPAddress broadcast = new IPAddress(0xffffffff); //255.255.255.255  i.e broadcast
+            Int32 port = 0x2fff; // port=12287 let's use this one 
+
             //MAC_ADDRESS should  look like '013FA049'
             if (mac.Length > 0)
             {
+                // Clean mac of ":".
                 string macAdr = mac.Replace(":", "");
+
                 try
                 {
                     WOLClass client = new WOLClass();
-                    client.Connect(new
-                        IPAddress(0xffffffff), //255.255.255.255  i.e broadcast
-                        0x2fff); // port=12287 let's use this one 
+                    client.Connect(broadcast, port); 
                     client.SetClientToBrodcastMode();
                     //set sending bites
                     int counter = 0;
@@ -254,7 +258,7 @@ namespace CMRPS_ProofOfConcept.Controllers
                     }
 
                     //now send wake up packet
-                    int reterned_value = client.Send(bytes, 1024);
+                    int returnValue = client.Send(bytes, 1024);
                     return true;
                 }
                 catch (Exception)
