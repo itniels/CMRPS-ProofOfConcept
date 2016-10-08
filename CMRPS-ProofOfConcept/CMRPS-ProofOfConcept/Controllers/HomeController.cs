@@ -117,7 +117,6 @@ namespace CMRPS_ProofOfConcept.Controllers
 
                 ConnectionOptions options = new ConnectionOptions();
                 options.EnablePrivileges = true;
-
                 options.Username = "USERNAME";
                 options.Password = "PASSWORD";
                 options.Authority = "skole.local";
@@ -168,9 +167,8 @@ namespace CMRPS_ProofOfConcept.Controllers
         /// </summary>
         public class WOLClass : UdpClient
         {
-            public WOLClass()
-                : base()
-            { }
+            public WOLClass(): base(){ }
+
             //this is needed to send broadcast packet
             public void SetClientToBrodcastMode()
             {
