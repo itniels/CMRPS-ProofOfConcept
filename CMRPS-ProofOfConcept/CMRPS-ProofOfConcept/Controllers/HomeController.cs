@@ -23,14 +23,7 @@ namespace CMRPS_ProofOfConcept.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
+            ViewBag.Message = "Proof Of Conecept Demo.";
 
             return View();
         }
@@ -55,20 +48,52 @@ namespace CMRPS_ProofOfConcept.Controllers
         [HttpPost]
         public bool Shutdown(string name)
         {
-            //return Shutdown1(name);
+            return CMDTEST(name);
+            return Shutdown1(name);
             return Shutdown2(name);
         }
 
         [HttpPost]
         public bool Wol(string mac)
         {
-            //return Wakeup1(mac);
+            return CMDTEST(mac);
+            return Wakeup1(mac);
             return Wakeup2(mac);
         }
 
         // ===============================================================================
         // SHUTDOWN
         // ===============================================================================
+
+        private bool CMDTEST(string name)
+        {
+
+            string cn = @"\" + name;
+            try
+            {
+                System.Diagnostics.Process proc = new System.Diagnostics.Process();
+                System.Security.SecureString ssPwd = new System.Security.SecureString();
+                proc.StartInfo.UseShellExecute = false;
+                proc.StartInfo.FileName = "cmd.exe";
+                proc.StartInfo.Arguments = "/C ping 8.8.8.8";
+                proc.StartInfo.CreateNoWindow = false;
+                proc.StartInfo.Domain = ConfigurationManager.AppSettings.Get("Domain");
+                proc.StartInfo.UserName = ConfigurationManager.AppSettings.Get("Username");
+                string password = ConfigurationManager.AppSettings.Get("Password");
+                foreach (char t in password)
+                {
+                    ssPwd.AppendChar(t);
+                }
+                proc.StartInfo.Password = ssPwd;
+                proc.Start();
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// Using the CMD in windows to shutdown.
@@ -168,7 +193,7 @@ namespace CMRPS_ProofOfConcept.Controllers
         /// </summary>
         public class WOLClass : UdpClient
         {
-            public WOLClass(): base(){ }
+            public WOLClass() : base() { }
 
             //this is needed to send broadcast packet
             public void SetClientToBrodcastMode()
@@ -234,7 +259,7 @@ namespace CMRPS_ProofOfConcept.Controllers
                 try
                 {
                     WOLClass client = new WOLClass();
-                    client.Connect(broadcast, port); 
+                    client.Connect(broadcast, port);
                     client.SetClientToBrodcastMode();
                     //set sending bites
                     int counter = 0;
