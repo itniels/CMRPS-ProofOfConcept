@@ -1,16 +1,20 @@
 ﻿
 // Ping
 function DemoPing() {
+    $('#ping-result').html("Pinging...");
+    $('#ping-result').attr("class", 'ping-result-style-unknown');
     $.ajax({
         url: "/Home/Ping",
         data: { 'name': $('#computer-name').val() },
         datatype: "text",
         type: "POST",
         success: function (data) {
-            $('#ping-result').html("ping: " + data);
+            
             if (data != -1) {
+                $('#ping-result').html("ping: " + data);
                 $("#ping-result").attr('class', 'ping-result-style-online');
             } else {
+                $('#ping-result').html("UNREACHABLE!");
                 $("#ping-result").attr('class', 'ping-result-style-offline');
             }
         },
@@ -23,6 +27,8 @@ function DemoPing() {
 
 // Shutdown
 function DemoShutdown() {
+    $('#shutdown-result').html("Sending...");
+    $('#shutdown-result').attr("class", 'ping-result-style-unknown');
     $.ajax({
         url: "/Home/Shutdown",
         data: { 'name': $('#computer-name').val() },
@@ -46,6 +52,8 @@ function DemoShutdown() {
 
 // Wake On Lan
 function DemoWol() {
+    $('#wol-result').html("Sending...");
+    $('#wol-result').attr("class", 'ping-result-style-unknown');
     $.ajax({
         url: "/Home/Wol",
         data: { 'mac': $('#computer-mac').val() },
