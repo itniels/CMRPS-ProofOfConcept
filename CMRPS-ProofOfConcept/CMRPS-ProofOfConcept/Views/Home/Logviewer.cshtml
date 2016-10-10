@@ -1,0 +1,29 @@
+﻿@model System.Collections.Generic.List<CMRPS_ProofOfConcept.Models.EventLogItem>
+
+@{
+
+}
+
+@foreach (var e in Model)
+{
+    <div class="panel @(e.Success ? "panel-success": "panel-danger")">
+        <div class="panel-heading">
+            @e.Action
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6 col-lg-6">
+                    <p><b>Time:</b> @e.Time</p>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                    <p><b>Info:</b> @e.Result</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-lg-12">
+                    <p><b>Exception:</b><br/> @e.Exception</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}

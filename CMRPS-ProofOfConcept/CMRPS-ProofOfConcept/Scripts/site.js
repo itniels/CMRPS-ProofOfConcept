@@ -10,7 +10,7 @@ function DemoPing() {
         type: "POST",
         success: function (data) {
             
-            if (data != -1) {
+            if (data !== -1) {
                 $('#ping-result').html("ping: " + data);
                 $("#ping-result").attr('class', 'ping-result-style-online');
             } else {
@@ -23,7 +23,7 @@ function DemoPing() {
             $("#ping-result").attr('class', 'ping-result-style-offline');
         }
     });
-};
+}
 
 // Shutdown
 function DemoShutdown() {
@@ -35,7 +35,7 @@ function DemoShutdown() {
         datatype: "text",
         type: "POST",
         success: function (data) {
-            if (data == "True") {
+            if (data === "True") {
                 $('#shutdown-result').html("SENT!");
                 $("#shutdown-result").attr('class', 'ping-result-style-online');
             } else {
@@ -48,7 +48,7 @@ function DemoShutdown() {
             $("#shutdown-result").attr('class', 'ping-result-style-offline');
         }
     });
-};
+}
 
 // Wake On Lan
 function DemoWol() {
@@ -60,7 +60,7 @@ function DemoWol() {
         datatype: "text",
         type: "POST",
         success: function (data) {
-            if (data == "True") {
+            if (data === "True") {
                 $('#wol-result').html("SENT!");
                 $("#wol-result").attr('class', 'ping-result-style-online');
             } else {
@@ -73,4 +73,4 @@ function DemoWol() {
             $("#wol-result").attr('class', 'ping-result-style-offline');
         }
     });
-};
+}
