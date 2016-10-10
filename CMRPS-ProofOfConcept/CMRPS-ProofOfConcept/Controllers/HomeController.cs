@@ -30,7 +30,6 @@ namespace CMRPS_ProofOfConcept.Controllers
 
         // ==================================================================
 
-        [HttpPost]
         public long Ping(string name)
         {
             bool pingable = false;
@@ -45,19 +44,17 @@ namespace CMRPS_ProofOfConcept.Controllers
             return -1;
         }
 
-        [HttpPost]
         public bool Shutdown(string name)
         {
-            return CMDTEST(name);
+            //return CMDTEST(name);
             return Shutdown1(name);
-            return Shutdown2(name);
+            //return Shutdown2(name);
         }
 
-        [HttpPost]
         public bool Wol(string mac)
         {
-            return CMDTEST(mac);
-            return Wakeup1(mac);
+            //return CMDTEST(mac);
+            //return Wakeup1(mac);
             return Wakeup2(mac);
         }
 
@@ -106,21 +103,23 @@ namespace CMRPS_ProofOfConcept.Controllers
             string cn = @"\" + name;
             try
             {
-                System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                System.Security.SecureString ssPwd = new System.Security.SecureString();
-                proc.StartInfo.UseShellExecute = false;
-                proc.StartInfo.FileName = "cmd.exe";
-                proc.StartInfo.Arguments = "/C shutdown /s /f /m " + cn + " /c CMRPS is shutting this device down.";
-                proc.StartInfo.CreateNoWindow = true;
-                proc.StartInfo.Domain = ConfigurationManager.AppSettings.Get("Domain");
-                proc.StartInfo.UserName = ConfigurationManager.AppSettings.Get("Username");
-                string password = ConfigurationManager.AppSettings.Get("Password");
-                foreach (char t in password)
-                {
-                    ssPwd.AppendChar(t);
-                }
-                proc.StartInfo.Password = ssPwd;
-                proc.Start();
+                Process.Start("shutdown", String.Format("/s /m \\\\{0} /t 30", name));
+                //System.Diagnostics.Process proc = new System.Diagnostics.Process();
+                //System.Security.SecureString ssPwd = new System.Security.SecureString();
+                //proc.StartInfo.UseShellExecute = false;
+                //proc.StartInfo.FileName = "cmd.exe";
+                //proc.StartInfo.Arguments = "/C shutdown -s -m " + cn;
+                ////proc.StartInfo.Arguments = "shutdown /s /m " + cn;
+                //proc.StartInfo.CreateNoWindow = true;
+                //proc.StartInfo.Domain = ConfigurationManager.AppSettings.Get("Domain");
+                //proc.StartInfo.UserName = ConfigurationManager.AppSettings.Get("Username");
+                //string password = ConfigurationManager.AppSettings.Get("Password");
+                //foreach (char t in password)
+                //{
+                //    ssPwd.AppendChar(t);
+                //}
+                //proc.StartInfo.Password = ssPwd;
+                //proc.Start();
             }
             catch (Exception ex)
             {
@@ -143,13 +142,18 @@ namespace CMRPS_ProofOfConcept.Controllers
 
                 ConnectionOptions options = new ConnectionOptions();
                 options.EnablePrivileges = true;
+
                 options.Username = ConfigurationManager.AppSettings.Get("Username");
                 options.Password = ConfigurationManager.AppSettings.Get("Password");
-                options.Authority = ConfigurationManager.AppSettings.Get("Domain");
+                options.Authority = "ntlmdomain:" + ConfigurationManager.AppSettings.Get("Domain");
 
-                ManagementScope scope = new ManagementScope(
-                    "\\\\" + name + "\\root\\CIMV2", options);
+                ManagementScope scope = new ManagementScope("\\\\" + name + "\\root\\CIMV2", options);
                 scope.Connect();
+
+                //if (!scope.IsConnected)
+                //{
+                //    return false;
+                //}
 
                 SelectQuery query = new SelectQuery("Win32_OperatingSystem");
                 ManagementObjectSearcher searcher = new ManagementObjectSearcher(scope, query);
@@ -177,7 +181,7 @@ namespace CMRPS_ProofOfConcept.Controllers
                 }
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return false;
             }
