@@ -35,9 +35,9 @@ textarea {
 }
 
 .ping-result-style-online {
-    color: green;
+    color: lightgreen;
 }
 
 .ping-result-style-offline {
-    color: red;
+    color: lightcoral;
 }
