@@ -91,6 +91,11 @@ namespace CMRPS_ProofOfConcept.Controllers
             return Shutdown2(name);
         }
 
+        public bool ShutdownCancel(string name)
+        {
+            return Shutdown3(name);
+        }
+
         public bool WolCMD(string mac)
         {
             return Wakeup1(mac);
@@ -118,27 +123,9 @@ namespace CMRPS_ProofOfConcept.Controllers
             data.Add("Name: " + name);
             try
             {
-                string args = String.Format("/s /m \\\\{0} /t 30", name);
+                string args = String.Format("-s -m \\\\{0} -t 30", name);
                 data.Add("Arguments: " + args);
                 Process.Start("shutdown", args);
-
-                //string cn = @"\" + name;
-                //System.Diagnostics.Process proc = new System.Diagnostics.Process();
-                //System.Security.SecureString ssPwd = new System.Security.SecureString();
-                //proc.StartInfo.UseShellExecute = false;
-                //proc.StartInfo.FileName = "cmd.exe";
-                //proc.StartInfo.Arguments = "/C shutdown -s -m " + cn;
-                ////proc.StartInfo.Arguments = "shutdown /s /m " + cn;
-                //proc.StartInfo.CreateNoWindow = true;
-                //proc.StartInfo.Domain = ConfigurationManager.AppSettings.Get("Domain");
-                //proc.StartInfo.UserName = ConfigurationManager.AppSettings.Get("Username");
-                //string password = ConfigurationManager.AppSettings.Get("Password");
-                //foreach (char t in password)
-                //{
-                //    ssPwd.AppendChar(t);
-                //}
-                //proc.StartInfo.Password = ssPwd;
-                //proc.Start();
             }
             catch (Exception ex)
             {
@@ -213,6 +200,27 @@ namespace CMRPS_ProofOfConcept.Controllers
                 AddLog("Shutdown WMI", data, ex.ToString(), false);
                 return false;
             }
+        }
+
+        private bool Shutdown3(string name)
+        {
+            List<string> data = new List<string>();
+            data.Add("Starting");
+            data.Add("Name: " + name);
+            try
+            {
+                string args = String.Format("-a -m \\\\{0}", name);
+                data.Add("Arguments: " + args);
+                Process.Start("shutdown", args);
+            }
+            catch (Exception ex)
+            {
+                AddLog("Shutdown Cancel", data, ex.ToString(), false);
+                return false;
+            }
+
+            AddLog("Shutdown Cancel", data, "none", true);
+            return true;
         }
 
 

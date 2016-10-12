@@ -17,6 +17,12 @@
         <textarea class="target-input" id="computer-mac" placeholder="'00:50:56:00:6D:65' OR '005056006D65'"></textarea>
     </div>
 </div>
+<br />
+<div class="row">
+    <span>Auto Fill: </span> 
+    <span class="btn btn-default" onclick="FillComputer('cb12');">CB12</span>
+    <span class="btn btn-default" onclick="FillComputer('lv1');">LV1</span>
+</div>
 
 <div class="row">
     <div class="col-md-4">
@@ -37,7 +43,11 @@
             <button class="btn btn-danger" onclick="Shutdown_WMI();">Use WMI</button>
         </p>
         <p>
-            <button class="btn btn-danger" onclick="Shutdown_CMD();">Use CMD</button>
+            <span class="btn btn-danger" onclick="Shutdown_CMD();">Use CMD</span> 
+            <span class="btn btn-warning" onclick="Shutdown_Cancel();">Cancel</span>
+        </p>
+        <p>
+            
         </p>
     </div>
     <div class="col-md-4">
