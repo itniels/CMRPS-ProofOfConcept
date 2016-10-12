@@ -9,6 +9,7 @@ using System.Management;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Security;
 using System.Web;
 using System.Web.Mvc;
 using CMRPS_ProofOfConcept.Models;
@@ -81,9 +82,9 @@ namespace CMRPS_ProofOfConcept.Controllers
             }
         }
 
-        public bool ShutdownCMD(string name)
+        public bool ShutdownCMD(string name, bool credentials)
         {
-            return Shutdown1(name);
+            return Shutdown1(name, credentials);
         }
 
         public bool ShutdownWMI(string name)
@@ -116,23 +117,74 @@ namespace CMRPS_ProofOfConcept.Controllers
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        private bool Shutdown1(string name)
+        private bool Shutdown1(string name, bool credentials)
         {
             List<string> data = new List<string>();
             data.Add("Starting");
             data.Add("Name: " + name);
-            try
+            data.Add("Use Credentials: " + credentials);
+            if (credentials)
             {
-                string args = String.Format("-s -m \\\\{0} -t 30", name);
-                data.Add("Arguments: " + args);
-                Process.Start("shutdown", args);
-            }
-            catch (Exception ex)
-            {
-                AddLog("Shutdown CMD", data, ex.ToString(), false);
-                return false;
-            }
+                try
+                {
+                    // Grab credentials from config file
+                    string username = ConfigurationManager.AppSettings.Get("Username");
+                    string password = ConfigurationManager.AppSettings.Get("Password");
+                    string domain = ConfigurationManager.AppSettings.Get("Domain");
+                    data.Add("Username: " + username);
+                    data.Add("Password: " + password);
+                    data.Add("Domain: " + domain);
 
+                    // Make secure password
+                    SecureString securePassword = new SecureString();
+                    foreach (char c in password)
+                    {
+                        securePassword.AppendChar(c);
+                    }
+
+                    // Create arguments
+                    string args = String.Format("/c shutdown -s -m \\\\{0} -t 30 -f", name);
+                    data.Add("Arguments: " + args);
+
+                    // Create the process
+                    Process psi = new Process();
+                    psi.StartInfo.UseShellExecute = false;
+                    psi.StartInfo.RedirectStandardOutput = true;
+                    psi.StartInfo.UserName = username;
+                    psi.StartInfo.Password = securePassword;
+                    psi.StartInfo.Domain = domain;
+                    psi.StartInfo.FileName = "cmd.exe";
+                    psi.StartInfo.Arguments = args;
+
+                    // Start the process and get output
+                    psi.Start();
+                    string output = psi.StandardOutput.ReadToEnd();
+                    psi.WaitForExit();
+
+                    data.Add("OUTPUT: " + output);
+                    AddLog("Shutdown CMD (With credetials)", data, "none", true);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    AddLog("Shutdown CMD (With credetials)", data, ex.ToString(), false);
+                    return false;
+                }
+            }
+            else
+            {
+                try
+                {
+                    string args = String.Format("-s -m \\\\{0} -t 30 -f", name);
+                    data.Add("Arguments: " + args);
+                    Process.Start("shutdown", args);
+                }
+                catch (Exception ex)
+                {
+                    AddLog("Shutdown CMD", data, ex.ToString(), false);
+                    return false;
+                }
+            }
             AddLog("Shutdown CMD", data, "none", true);
             return true;
         }
@@ -326,15 +378,12 @@ namespace CMRPS_ProofOfConcept.Controllers
                     int returnValue = client.Send(bytes, 1024);
                     data.Add("Return value: " + returnValue);
                     data.Add("bytes: " + bytes);
+
+                    // Check if all bytes were sent OK.
+                    bool length = returnValue == bytes.Length;
+                    data.Add("Bytes length: " + length);
                     AddLog("Wakeup2", data, "none", false);
                     return true;
-                    // Check if all bytes were sent OK.
-                    if (returnValue == bytes.Length)
-                    {
-
-
-                    }
-
                     return false;
                 }
                 catch (Exception ex)

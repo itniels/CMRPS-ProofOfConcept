@@ -9,7 +9,7 @@ function DemoPing() {
         datatype: "text",
         type: "POST",
         success: function (data) {
-            
+
             if (data !== -1) {
                 $('#ping-result').html("ping: " + data);
                 $("#ping-result").attr('class', 'ping-result-style-online');
@@ -31,7 +31,7 @@ function Shutdown_WMI() {
     $('#shutdown-result').attr("class", 'ping-result-style-unknown');
     $.ajax({
         url: "/Home/ShutdownWMI",
-        data: { 'name': $('#computer-name').val() },
+        data: { 'name': $('#computer-name').val(), 'credentials': "True" },
         datatype: "text",
         type: "POST",
         success: function (data) {
@@ -55,7 +55,7 @@ function Shutdown_CMD() {
     $('#shutdown-result').attr("class", 'ping-result-style-unknown');
     $.ajax({
         url: "/Home/ShutdownCMD",
-        data: { 'name': $('#computer-name').val() },
+        data: { 'name': $('#computer-name').val(), 'credentials': $("#use-credentials").is(":checked") },
         datatype: "text",
         type: "POST",
         success: function (data) {
@@ -148,12 +148,12 @@ function Wol_Winwake() {
 }
 
 function FillComputer(name) {
-    if (name == 'cb12') {
-        $("#computer-name").val("cb12")
-        $("#computer-mac").val("00:25:64:51:AB:A3")
+    if (name === 'cb12') {
+        $("#computer-name").val("cb12");
+        $("#computer-mac").val("00:25:64:51:AB:A3");
     }
-    if (name == 'lv1') {
-        $("#computer-name").val("lv1")
-        $("#computer-mac").val("D4:BE:D9:6A:5D:0F")
+    if (name === 'lv1') {
+        $("#computer-name").val("lv1");
+        $("#computer-mac").val("D4:BE:D9:6A:5D:0F");
     }
 }
