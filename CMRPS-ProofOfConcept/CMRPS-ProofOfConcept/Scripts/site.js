@@ -26,11 +26,35 @@ function DemoPing() {
 }
 
 // Shutdown
-function DemoShutdown() {
+function Shutdown_WMI() {
     $('#shutdown-result').html("Sending...");
     $('#shutdown-result').attr("class", 'ping-result-style-unknown');
     $.ajax({
-        url: "/Home/Shutdown",
+        url: "/Home/ShutdownWMI",
+        data: { 'name': $('#computer-name').val() },
+        datatype: "text",
+        type: "POST",
+        success: function (data) {
+            if (data === "True") {
+                $('#shutdown-result').html("SENT!");
+                $("#shutdown-result").attr('class', 'ping-result-style-online');
+            } else {
+                $('#shutdown-result').html("NOT SENT!!");
+                $("#shutdown-result").attr('class', 'ping-result-style-offline');
+            }
+        },
+        error: function () {
+            $('#shutdown-result').html("ERROR!");
+            $("#shutdown-result").attr('class', 'ping-result-style-offline');
+        }
+    });
+}
+
+function Shutdown_CMD() {
+    $('#shutdown-result').html("Sending...");
+    $('#shutdown-result').attr("class", 'ping-result-style-unknown');
+    $.ajax({
+        url: "/Home/ShutdownCMD",
         data: { 'name': $('#computer-name').val() },
         datatype: "text",
         type: "POST",
@@ -51,11 +75,35 @@ function DemoShutdown() {
 }
 
 // Wake On Lan
-function DemoWol() {
+function Wol_Packet() {
     $('#wol-result').html("Sending...");
     $('#wol-result').attr("class", 'ping-result-style-unknown');
     $.ajax({
-        url: "/Home/Wol",
+        url: "/Home/WolPacket",
+        data: { 'mac': $('#computer-mac').val() },
+        datatype: "text",
+        type: "POST",
+        success: function (data) {
+            if (data === "True") {
+                $('#wol-result').html("SENT!");
+                $("#wol-result").attr('class', 'ping-result-style-online');
+            } else {
+                $('#wol-result').html("NOT SENT!!");
+                $("#wol-result").attr('class', 'ping-result-style-offline');
+            }
+        },
+        error: function () {
+            $('#wol-result').html("ERROR!");
+            $("#wol-result").attr('class', 'ping-result-style-offline');
+        }
+    });
+}
+
+function Wol_Winwake() {
+    $('#wol-result').html("Sending...");
+    $('#wol-result').attr("class", 'ping-result-style-unknown');
+    $.ajax({
+        url: "/Home/WolCMD",
         data: { 'mac': $('#computer-mac').val() },
         datatype: "text",
         type: "POST",

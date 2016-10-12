@@ -12,6 +12,7 @@ using System.Net.Sockets;
 using System.Web;
 using System.Web.Mvc;
 using CMRPS_ProofOfConcept.Models;
+using Microsoft.Owin.Security.Provider;
 
 namespace CMRPS_ProofOfConcept.Controllers
 {
@@ -33,17 +34,18 @@ namespace CMRPS_ProofOfConcept.Controllers
 
         public ActionResult Logviewer()
         {
-            return View(Events);
+            //List<EventLogItem> events = Events.OrderByDescending(x => x.Time);
+            return View(Events.OrderByDescending(x => x.Time));
         }
 
         // ==================================================================
 
-        private void AddLog(string action, string result, string exception, bool success)
+        private void AddLog(string action, List<string> listOfData, string exception, bool success)
         {
             EventLogItem item = new EventLogItem();
             item.Time = DateTime.Now;
             item.Action = action;
-            item.Result = result;
+            item.listOfData = listOfData;
             item.Exception = exception;
             item.Success = success;
             Events.Add(item);
@@ -51,51 +53,54 @@ namespace CMRPS_ProofOfConcept.Controllers
 
         public long Ping(string name)
         {
+            List<string> data = new List<string>();
+            data.Add("Starting");
+            data.Add("Name: " + name);
             if (name.Length > 0)
             {
-                AddLog("Ping", "Starting Ping for: " + name, "none", true);
                 bool pingable = false;
                 Ping pinger = new Ping();
                 try
                 {
                     PingReply reply = pinger.Send(name);
                     pingable = reply.Status == IPStatus.Success;
-                    if (pingable)
-                    {
-                        AddLog("Ping", "Recived ping for: " + name, "none", true);
-                    }
-                    else
-                    {
-                        AddLog("Ping", "Failed ping for: " + name, "No reply! bad address?", false);
-                    }
+                    data.Add("Pingable: " + pingable);
+                    AddLog("Ping", data, "none", true);
                     return reply.RoundtripTime;
                 }
                 catch (PingException ex)
                 {
-                    AddLog("Ping", "ERROR in Ping for: " + name, ex.ToString(), false);
+                    AddLog("Ping", data, ex.ToString(), false);
                 }
                 return -1;
             }
             else
             {
-                AddLog("Ping", "ERROR ping for: " + name, "No address given!", false);
+                AddLog("Ping", data, "none", true);
                 return -1;
             }
         }
 
-        public bool Shutdown(string name)
+        public bool ShutdownCMD(string name)
         {
-            //return CMDTEST(name);
             return Shutdown1(name);
-            //return Shutdown2(name);
         }
 
-        public bool Wol(string mac)
+        public bool ShutdownWMI(string name)
         {
-            //return CMDTEST(mac);
-            //return Wakeup1(mac);
+            return Shutdown2(name);
+        }
+
+        public bool WolCMD(string mac)
+        {
+            return Wakeup1(mac);
+        }
+
+        public bool WolPacket(string mac)
+        {
             return Wakeup2(mac);
         }
+
 
         // ===============================================================================
         // SHUTDOWN
@@ -108,11 +113,14 @@ namespace CMRPS_ProofOfConcept.Controllers
         /// <returns></returns>
         private bool Shutdown1(string name)
         {
-            AddLog("Shutdown1", "Starting shutdown1 for: " + name, "none", true);
-
+            List<string> data = new List<string>();
+            data.Add("Starting");
+            data.Add("Name: " + name);
             try
             {
-                Process.Start("shutdown", String.Format("/s /m \\\\{0} /t 30", name));
+                string args = String.Format("/s /m \\\\{0} /t 30", name);
+                data.Add("Arguments: " + args);
+                Process.Start("shutdown", args);
 
                 //string cn = @"\" + name;
                 //System.Diagnostics.Process proc = new System.Diagnostics.Process();
@@ -134,11 +142,11 @@ namespace CMRPS_ProofOfConcept.Controllers
             }
             catch (Exception ex)
             {
-                AddLog("Shutdown1", "ERROR in shutdown for: " + name, ex.ToString(), false);
+                AddLog("Shutdown CMD", data, ex.ToString(), false);
                 return false;
             }
 
-            AddLog("Shutdown1", "OK shutdown for: " + name, "none", true);
+            AddLog("Shutdown CMD", data, "none", true);
             return true;
         }
 
@@ -149,7 +157,9 @@ namespace CMRPS_ProofOfConcept.Controllers
         /// <returns></returns>
         private bool Shutdown2(string name)
         {
-            AddLog("Shutdown2", "Started shutdown for: " + name, "none", true);
+            List<string> data = new List<string>();
+            data.Add("Starting");
+            data.Add("Name: " + name);
             try
             {
                 ConnectionOptions options = new ConnectionOptions();
@@ -158,10 +168,14 @@ namespace CMRPS_ProofOfConcept.Controllers
                 options.Username = ConfigurationManager.AppSettings.Get("Username");
                 options.Password = ConfigurationManager.AppSettings.Get("Password");
                 options.Authority = "ntlmdomain:" + ConfigurationManager.AppSettings.Get("Domain");
+                data.Add("Option Username: " + options.Username);
+                data.Add("Option Password: " + ConfigurationManager.AppSettings.Get("Password"));
+                data.Add("Option Authority: " + options.Authority);
 
                 ManagementScope scope = new ManagementScope("\\\\" + name + "\\root\\CIMV2", options);
+                data.Add("Scope Path: " + scope.Path);
                 scope.Connect();
-
+                data.Add("Scope Connected: " + scope.IsConnected);
                 //if (!scope.IsConnected)
                 //{
                 //    return false;
@@ -191,12 +205,12 @@ namespace CMRPS_ProofOfConcept.Controllers
                     //ManagementBaseObject outParams = os.InvokeMethod("Win32Shutdown", inParams, null);
                     ManagementBaseObject outParams = os.InvokeMethod("Win32Shutdown", inParams, null);
                 }
-                AddLog("Shutdown2", "OK shutdown for: " + name, "none", true);
+                AddLog("Shutdown WMI", data, "none", true);
                 return true;
             }
             catch (Exception ex)
             {
-                AddLog("Shutdown2", "ERROR shutdown for: " + name, ex.ToString(), false);
+                AddLog("Shutdown WMI", data, ex.ToString(), false);
                 return false;
             }
         }
@@ -223,7 +237,6 @@ namespace CMRPS_ProofOfConcept.Controllers
             }
         }
 
-
         /// <summary>
         /// Using WINWAKE.exe to start a computer.
         /// </summary>
@@ -231,19 +244,24 @@ namespace CMRPS_ProofOfConcept.Controllers
         /// <returns></returns>
         private bool Wakeup1(string mac)
         {
-            AddLog("Wakeup1", "Started wakeup for: " + mac, "none", true);
+            List<string> data = new List<string>();
+            data.Add("Starting");
+            data.Add("MAC: " + mac);
 
             string cleanMac = mac.Replace(":", "");
+            data.Add("Clean MAC: " + cleanMac);
             try
             {
-                Process.Start(@"WINWAKE.EXE", String.Format("{0}", cleanMac));
+                string args = String.Format("{0}", cleanMac);
+                data.Add("Arguments: " + args);
+                Process.Start(@"WINWAKE.EXE", args);
             }
             catch (Exception ex)
             {
-                AddLog("Wakeup1", "Started wakeup for: " + mac, ex.ToString(), false);
+                AddLog("Wakeup Winwake", data, ex.ToString(), false);
                 return false;
             }
-            AddLog("Wakeup1", "OK wakeup for: " + mac, "none", true);
+            AddLog("Wakeup Winwake", data, "none", true);
             return true;
         }
 
@@ -254,17 +272,21 @@ namespace CMRPS_ProofOfConcept.Controllers
         /// <returns></returns>
         public bool Wakeup2(string mac)
         {
-            AddLog("Wakeup2", "Started wakeup for: " + mac, "none", true);
+            List<string> data = new List<string>();
+            data.Add("Starting");
+            data.Add("MAC: " + mac);
 
-            IPAddress broadcast = new IPAddress(0xffffffff); //255.255.255.255  i.e broadcast
+            //IPAddress broadcast = new IPAddress(0xffffffff); //255.255.255.255  i.e broadcast
+            IPAddress broadcast = IPAddress.Parse("255.255.255.255");
             Int32 port = 0x2fff; // port=12287 let's use this one 
-
+            data.Add("IPAdress: " + broadcast);
+            data.Add("Port: " + port);
             //MAC_ADDRESS should  look like '013FA049'
             if (mac.Length > 0)
             {
                 // Clean mac of ":".
                 string macAdr = mac.Replace(":", "");
-
+                data.Add("Clean mac: " + macAdr);
                 try
                 {
                     WOLClass client = new WOLClass();
@@ -292,26 +314,28 @@ namespace CMRPS_ProofOfConcept.Controllers
 
                     // Now send wake up packet
                     int returnValue = client.Send(bytes, 1024);
-
+                    data.Add("Return value: " + returnValue);
+                    data.Add("bytes: " + bytes);
+                    AddLog("Wakeup2", data, "none", false);
+                    return true;
                     // Check if all bytes were sent OK.
                     if (returnValue == bytes.Length)
                     {
-                        AddLog("Wakeup2", "Started wakeup for: " + mac, "none", true);
-                        return true;
+
+
                     }
 
-                    AddLog("Wakeup2", "ERROR wakeup for: " + mac, "Not all bytes sent!", false);
                     return false;
                 }
                 catch (Exception ex)
                 {
-                    AddLog("Wakeup2", "ERROR wakeup for: " + mac, ex.ToString(), false);
+                    AddLog("Wakeup Packet", data, ex.ToString(), false);
                     return false;
                 }
             }
             else
             {
-                AddLog("Wakeup2", "ERROR wakeup for: " + mac, "No mac found!", false);
+                AddLog("Wakeup Packet", data, "No mac found!", false);
                 return false;
             }
         }

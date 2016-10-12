@@ -1,4 +1,4 @@
-﻿@model System.Collections.Generic.List<CMRPS_ProofOfConcept.Models.EventLogItem>
+﻿@model IEnumerable<CMRPS_ProofOfConcept.Models.EventLogItem>
 
 @{
 
@@ -16,9 +16,21 @@
                     <p><b>Time:</b> @e.Time</p>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                    <p><b>Info:</b> @e.Result</p>
+                    <p><b>Success:</b> @(e.Success ? "YES" : "No")
+                    </p>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-12 col-lg-12">
+                    <p><b>Data:</b>
+                    </p>
+                    @foreach (string s in e.listOfData)
+                    {
+                        <div>@s.ToString()</div>
+                    }
+                </div>
+            </div>
+            <br/>
             <div class="row">
                 <div class="col-md-12 col-lg-12">
                     <p><b>Exception:</b><br/> @e.Exception</p>

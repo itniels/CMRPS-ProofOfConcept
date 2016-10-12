@@ -34,7 +34,10 @@
         <p>Here you can test remote shutdown.</p>
         <p id="shutdown-result" class="ping-result-style-unknown">Not sent yet..</p>
         <p>
-            <button class="btn btn-danger" onclick="DemoShutdown();">Shut it down!</button>
+            <button class="btn btn-danger" onclick="Shutdown_WMI();">Use WMI</button>
+        </p>
+        <p>
+            <button class="btn btn-danger" onclick="Shutdown_CMD();">Use CMD</button>
         </p>
     </div>
     <div class="col-md-4">
@@ -42,7 +45,10 @@
         <p>Here you can test Wake-On-Lan</p>
         <p id="wol-result" class="ping-result-style-unknown">Not sent yet..</p>
         <p>
-            <button class="btn btn-success" onclick="DemoWol();">Wake it up!</button>
+            <button class="btn btn-success" onclick="Wol_Packet();">Use Packet</button>
+        </p>
+        <p>
+            <button class="btn btn-success" onclick="Wol_Winwake();">Use Winwake.exe</button>
         </p>
     </div>
 </div>
