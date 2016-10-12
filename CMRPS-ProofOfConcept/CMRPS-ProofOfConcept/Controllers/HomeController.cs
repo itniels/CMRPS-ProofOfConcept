@@ -236,13 +236,13 @@ namespace CMRPS_ProofOfConcept.Controllers
                     // ForcedReboot = 6,
                     // PowerOff = 8,
                     // ForcedPowerOff = 12
-                    // Add the input parameters.
                     inParams["Flags"] = 5;
 
 
                     // Execute the method and obtain the return values.
                     //ManagementBaseObject outParams = os.InvokeMethod("Win32Shutdown", inParams, null);
                     ManagementBaseObject outParams = os.InvokeMethod("Win32Shutdown", inParams, null);
+                    //data.Add("Out Params: " + outParams);
                 }
                 AddLog("Shutdown WMI", data, "none", true);
                 return true;
@@ -384,7 +384,6 @@ namespace CMRPS_ProofOfConcept.Controllers
                     data.Add("Bytes length: " + length);
                     AddLog("Wakeup2", data, "none", false);
                     return true;
-                    return false;
                 }
                 catch (Exception ex)
                 {
