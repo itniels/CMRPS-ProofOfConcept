@@ -254,7 +254,9 @@ namespace CMRPS_ProofOfConcept.Controllers
             {
                 string args = String.Format("{0}", cleanMac);
                 data.Add("Arguments: " + args);
-                Process.Start(@"WINWAKE.EXE", args);
+                string path = @"c:\WINWAKE.exe";
+                data.Add("Path: " + path);
+                Process.Start(path, args);
             }
             catch (Exception ex)
             {
