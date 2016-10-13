@@ -67,7 +67,15 @@ namespace CMRPS_ProofOfConcept.Controllers
                     pingable = reply.Status == IPStatus.Success;
                     data.Add("Pingable: " + pingable);
                     AddLog("Ping", data, "none", true);
-                    return reply.RoundtripTime;
+                    if (pingable)
+                    {
+                        return reply.RoundtripTime;
+                    }
+                    else
+                    {
+                        return -1;
+                    }
+                    
                 }
                 catch (PingException ex)
                 {
@@ -382,7 +390,7 @@ namespace CMRPS_ProofOfConcept.Controllers
                     // Check if all bytes were sent OK.
                     bool length = returnValue == bytes.Length;
                     data.Add("Bytes length: " + length);
-                    AddLog("Wakeup2", data, "none", false);
+                    AddLog("Wakeup2", data, "none", true);
                     return true;
                 }
                 catch (Exception ex)

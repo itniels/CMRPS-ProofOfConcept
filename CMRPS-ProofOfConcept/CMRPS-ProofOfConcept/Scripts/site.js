@@ -10,7 +10,7 @@ function DemoPing() {
         type: "POST",
         success: function (data) {
 
-            if (data !== -1) {
+            if (data >= 0) {
                 $('#ping-result').html("ping: " + data);
                 $("#ping-result").attr('class', 'ping-result-style-online');
             } else {
