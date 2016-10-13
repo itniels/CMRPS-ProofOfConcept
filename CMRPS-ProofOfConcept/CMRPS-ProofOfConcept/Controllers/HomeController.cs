@@ -151,17 +151,21 @@ namespace CMRPS_ProofOfConcept.Controllers
                     }
 
                     // Create arguments
-                    string args = String.Format("/c shutdown -s -m \\\\{0} -t 30 -f", name);
+                    //string args = String.Format("/C shutdown -s -m \\\\{0} -t 30 -f", name);
+                    string args = String.Format("-s -m \\\\{0} -t 00 -f", name);
                     data.Add("Arguments: " + args);
 
                     // Create the process
                     Process psi = new Process();
                     psi.StartInfo.UseShellExecute = false;
+                    psi.StartInfo.CreateNoWindow = false;
+                    psi.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                     psi.StartInfo.RedirectStandardOutput = true;
                     psi.StartInfo.UserName = username;
-                    psi.StartInfo.Password = securePassword;
+                    //psi.StartInfo.Password = securePassword;
+                    psi.StartInfo.PasswordInClearText = password;
                     psi.StartInfo.Domain = domain;
-                    psi.StartInfo.FileName = "cmd.exe";
+                    psi.StartInfo.FileName = @"shutdown.exe";
                     psi.StartInfo.Arguments = args;
 
                     // Start the process and get output
@@ -170,12 +174,12 @@ namespace CMRPS_ProofOfConcept.Controllers
                     psi.WaitForExit();
 
                     data.Add("OUTPUT: " + output);
-                    AddLog("Shutdown CMD (With credetials)", data, "none", true);
+                    AddLog("Shutdown CMD (With credentials)", data, "none", true);
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    AddLog("Shutdown CMD (With credetials)", data, ex.ToString(), false);
+                    AddLog("Shutdown CMD (With credentials)", data, ex.ToString(), false);
                     return false;
                 }
             }
@@ -183,7 +187,7 @@ namespace CMRPS_ProofOfConcept.Controllers
             {
                 try
                 {
-                    string args = String.Format("-s -m \\\\{0} -t 30 -f", name);
+                    string args = String.Format("-s -m \\\\{0} -t 00 -f", name);
                     data.Add("Arguments: " + args);
                     Process.Start("shutdown", args);
                 }
