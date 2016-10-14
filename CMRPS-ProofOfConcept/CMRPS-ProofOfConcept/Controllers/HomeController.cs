@@ -28,7 +28,7 @@ namespace CMRPS_ProofOfConcept.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "Proof Of Conecept Demo.";
+            ViewBag.Message = "Proof Of Concept Demo.";
 
             return View();
         }
@@ -59,12 +59,11 @@ namespace CMRPS_ProofOfConcept.Controllers
             data.Add("Name: " + name);
             if (name.Length > 0)
             {
-                bool pingable = false;
                 Ping pinger = new Ping();
                 try
                 {
                     PingReply reply = pinger.Send(name);
-                    pingable = reply.Status == IPStatus.Success;
+                    bool pingable = reply.Status == IPStatus.Success;
                     data.Add("Pingable: " + pingable);
                     AddLog("Ping", data, "none", true);
                     if (pingable)
